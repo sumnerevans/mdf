@@ -27,7 +27,7 @@ var boldRed = color.New(color.Bold, color.FgRed)
 // Regular email regular expressions
 var dateMatchRe = regexp.MustCompile(`Date: (.*)`)
 var emailRe = regexp.MustCompile(`<mailto:(.*?)>`)
-var urlRe = regexp.MustCompile(`https?:\/\/[^\s\]>]*`)
+var urlRe = regexp.MustCompile(`https?:\/\/[^\s\)\]>]*`)
 var tzNameRe = regexp.MustCompile(`\/.*\/([^/]+\/[^/]+)`)
 
 func RunFilter(rootUri string) {
