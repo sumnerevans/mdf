@@ -5,7 +5,6 @@ pkgs.mkShell {
     go
     gotools
     gopls
-    vgo2nix
     yq
   ];
 }
