@@ -3,7 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"regexp"
@@ -119,7 +119,7 @@ func RunFilter(rootUri string) {
 				if len(rootUri)+6 < len(match[0]) {
 					resp, err := http.Post(rootUri+"new", "text/text", strings.NewReader(match[0]))
 					if err == nil {
-						id, err := ioutil.ReadAll(resp.Body)
+						id, err := io.ReadAll(resp.Body)
 						if err == nil {
 							line = strings.ReplaceAll(line, match[0], rootUri+string(id))
 						}
