@@ -25,10 +25,11 @@ var boldGreen = color.New(color.Bold, color.FgGreen)
 var boldRed = color.New(color.Bold, color.FgRed)
 
 // Regular email regular expressions
-var dateMatchRe = regexp.MustCompile(`Date: (.*)`)
+var dateMatchRe = regexp.MustCompile(`^Date: (.*)`)
 var emailRe = regexp.MustCompile(`<mailto:(.*?)>`)
 var urlRe = regexp.MustCompile(`https?:\/\/[^\s\)\]>]*`)
 var tzNameRe = regexp.MustCompile(`\/.*\/([^/]+\/[^/]+)`)
+var xmailerRe = regexp.MustCompile(`^X-Mailer: (.*)`)
 
 func RunFilter(rootUri string) {
 	scanner := bufio.NewScanner(os.Stdin)
@@ -111,6 +112,8 @@ func RunFilter(rootUri string) {
 				}
 			}
 			fmt.Println()
+		} else if match := xmailerRe.FindString(line); len(match) > 0 {
+			color.Red(line)
 		} else {
 			for _, match := range emailRe.FindAllStringSubmatch(line, -1) {
 				line = strings.ReplaceAll(line, fmt.Sprintf("%s<mailto:%s>", match[1], match[1]), match[1])
