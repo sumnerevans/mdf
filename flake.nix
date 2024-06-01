@@ -15,7 +15,7 @@
           version = "unstable-2023-12-04";
           src = self;
 
-          vendorHash = "sha256-PcXa+5cvprr9h0RaGvlSG5GtNYT7A8pn3sD0neisHec=";
+          vendorHash = "sha256-CuO80I648lrHpaJ+T4yWwfmX6J1wDpkr2mVGHMybt0A=";
         };
         defaultPackage = packages.mdf;
 

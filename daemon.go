@@ -7,8 +7,6 @@ import (
 	"log"
 	"math/big"
 	"net/http"
-
-	"github.com/gorilla/mux"
 )
 
 func RunDaemon(port int) {
@@ -16,13 +14,12 @@ func RunDaemon(port int) {
 		Links: map[string]string{},
 	}
 
-	router := mux.NewRouter()
-	router.HandleFunc("/new", mdfd.New)
-	router.HandleFunc("/{id}", mdfd.RedirectPage)
-	http.Handle("/", router)
+	router := http.NewServeMux()
+	router.HandleFunc("POST /new", mdfd.New)
+	router.HandleFunc("GET /{id}", mdfd.RedirectPage)
 
 	log.Printf("Listening on port %d...", port)
-	err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
+	err := http.ListenAndServe(fmt.Sprintf(":%d", port), router)
 	if err != nil {
 		log.Printf("Failed to listen: %v", err)
 	}
@@ -45,10 +42,6 @@ func (mdfd *MuttDisplayFilterDaemon) randomString(length int) string {
 }
 
 func (mdfd *MuttDisplayFilterDaemon) New(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		w.WriteHeader(405)
-		return
-	}
 	url, err := io.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(500)
@@ -62,8 +55,7 @@ func (mdfd *MuttDisplayFilterDaemon) New(w http.ResponseWriter, r *http.Request)
 }
 
 func (mdfd *MuttDisplayFilterDaemon) RedirectPage(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
+	id := r.PathValue("id")
 	log.Printf("Serving /%s", id)
 
 	url, ok := mdfd.Links[id]
