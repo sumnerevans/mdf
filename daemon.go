@@ -72,12 +72,26 @@ func (mdfd *MuttDisplayFilterDaemon) RedirectPage(w http.ResponseWriter, r *http
 	<body>
 		<textarea id="url_edit" rows="10" style="width: 100%%;">%s</textarea>
 		<br />
-		<input id="go" type="button" value="Go" />
+		<input id="go" type="button" value="Go (5)" disabled />
 		<script>
-			const redirect = () => window.location.replace(document.getElementById('url_edit').value);
-			document.getElementById('go').addEventListener('click', redirect);
-			document.onkeypress = e => e.keyCode === 13 && redirect() && false;
 			document.getElementById('url_edit').focus();
+			document.onkeypress = e => e.keyCode === 13 && false;
+			let i = 5;
+			const goButton = document.getElementById('go');
+			const interval = setInterval(() => {
+				i--;
+				if (i > 0) {
+					goButton.value = 'Go ('+i+')';
+				} else {
+					const redirect = () => window.location.replace(document.getElementById('url_edit').value);
+
+					goButton.value = 'Go';
+					goButton.removeAttribute('disabled');
+					goButton.addEventListener('click', redirect);
+					document.onkeypress = e => e.keyCode === 13 && redirect() && false;
+					clearInterval(interval);
+				}
+			}, 1000);
 		</script>
 	</body>
 	</html>`, url)
