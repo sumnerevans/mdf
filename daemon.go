@@ -7,6 +7,7 @@ import (
 	"log"
 	"math/big"
 	"net/http"
+	"sync"
 )
 
 func RunDaemon(port int) {
@@ -27,6 +28,7 @@ func RunDaemon(port int) {
 
 type MuttDisplayFilterDaemon struct {
 	Links map[string]string
+	mu    sync.RWMutex
 }
 
 var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
@@ -48,7 +50,9 @@ func (mdfd *MuttDisplayFilterDaemon) New(w http.ResponseWriter, r *http.Request)
 	} else {
 		id := mdfd.randomString(6)
 		log.Printf("Creating mapping of %s to %s", id, url)
+		mdfd.mu.Lock()
 		mdfd.Links[id] = string(url)
+		mdfd.mu.Unlock()
 		w.WriteHeader(200)
 		io.WriteString(w, id)
 	}
@@ -58,7 +62,9 @@ func (mdfd *MuttDisplayFilterDaemon) RedirectPage(w http.ResponseWriter, r *http
 	id := r.PathValue("id")
 	log.Printf("Serving /%s", id)
 
+	mdfd.mu.RLock()
 	url, ok := mdfd.Links[id]
+	mdfd.mu.RUnlock()
 
 	if !ok {
 		log.Printf("%s not found", id)

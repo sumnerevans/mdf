@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"regexp"
@@ -36,6 +37,11 @@ func RunFilter(rootUri string) {
 
 	// Force color output
 	color.NoColor = false
+
+	// HTTP client with timeout for URL shortening
+	client := &http.Client{
+		Timeout: 500 * time.Millisecond,
+	}
 
 	// Git Diff state
 	hitDiff := false
@@ -120,13 +126,18 @@ func RunFilter(rootUri string) {
 			}
 			for _, match := range urlRe.FindAllStringSubmatch(line, -1) {
 				if len(rootUri)+6 < len(match[0]) {
-					resp, err := http.Post(rootUri+"new", "text/text", strings.NewReader(match[0]))
-					if err == nil {
-						id, err := io.ReadAll(resp.Body)
-						if err == nil {
-							line = strings.ReplaceAll(line, match[0], rootUri+string(id))
-						}
+					resp, err := client.Post(rootUri+"new", "text/plain", strings.NewReader(match[0]))
+					if err != nil {
+						log.Printf("Failed to shorten URL %s: %v", match[0], err)
+						continue
 					}
+					id, err := io.ReadAll(resp.Body)
+					resp.Body.Close()
+					if err != nil {
+						log.Printf("Failed to read shortened URL ID: %v", err)
+						continue
+					}
+					line = strings.ReplaceAll(line, match[0], rootUri+string(id))
 				}
 			}
 			fmt.Println(line)
