@@ -32,7 +32,7 @@ var urlRe = regexp.MustCompile(`https?:\/\/[^\s\)\]>]*`)
 var tzNameRe = regexp.MustCompile(`\/.*\/([^/]+\/[^/]+)`)
 var xmailerRe = regexp.MustCompile(`^X-Mailer: (.*)`)
 
-func RunFilter(rootUri string) {
+func RunFilter(rootURI string) {
 	scanner := bufio.NewScanner(os.Stdin)
 
 	// Force color output
@@ -125,8 +125,8 @@ func RunFilter(rootUri string) {
 				line = strings.ReplaceAll(line, fmt.Sprintf("%s<mailto:%s>", match[1], match[1]), match[1])
 			}
 			for _, match := range urlRe.FindAllStringSubmatch(line, -1) {
-				if len(rootUri)+6 < len(match[0]) {
-					resp, err := client.Post(rootUri+"new", "text/plain", strings.NewReader(match[0]))
+				if len(rootURI)+6 < len(match[0]) {
+					resp, err := client.Post(rootURI+"new", "text/plain", strings.NewReader(match[0]))
 					if err != nil {
 						log.Printf("Failed to shorten URL %s: %v", match[0], err)
 						continue
@@ -137,7 +137,7 @@ func RunFilter(rootUri string) {
 						log.Printf("Failed to read shortened URL ID: %v", err)
 						continue
 					}
-					line = strings.ReplaceAll(line, match[0], rootUri+string(id))
+					line = strings.ReplaceAll(line, match[0], rootURI+string(id))
 				}
 			}
 			fmt.Println(line)

@@ -73,7 +73,7 @@ func (mdfd *MuttDisplayFilterDaemon) RedirectPage(w http.ResponseWriter, r *http
 	}
 	log.Printf("Serving redirect page for %s -> %s", id, url)
 
-	respHtml := fmt.Sprintf(`<!doctype html>
+	respHTML := fmt.Sprintf(`<!doctype html>
 	<html>
 	<body>
 		<textarea id="url_edit" rows="10" style="width: 100%%;">%s</textarea>
@@ -104,5 +104,5 @@ func (mdfd *MuttDisplayFilterDaemon) RedirectPage(w http.ResponseWriter, r *http
 
 	w.Header().Set("Content-Type", "text/html")
 	w.WriteHeader(200)
-	io.WriteString(w, respHtml)
+	io.WriteString(w, respHTML)
 }
